@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+rom flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 import string
 import random
@@ -65,7 +65,8 @@ def redirect_url(short_code):
         return redirect(original_url)
     return "URL not found", 404
 
+import os
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.eviron.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
