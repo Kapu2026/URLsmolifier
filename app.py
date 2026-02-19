@@ -5,7 +5,7 @@ import random
 import os
 
 app = Flask(__name__)
-DATABASE = "urls.db"
+DATABASE = os.path.join("/tmp", "urls.db")
 
 # Initialize database
 def init_db():
