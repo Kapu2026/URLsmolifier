@@ -1,4 +1,4 @@
-rom flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect
 import sqlite3
 import string
 import random
@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 DATABASE = "urls.db"
 
-# Create database if it doesn't exist
+# Initialize database
 def init_db():
     with sqlite3.connect(DATABASE) as conn:
         conn.execute('''
@@ -19,10 +19,12 @@ def init_db():
         ''')
 init_db()
 
+# Generate random short code
 def generate_short_code(length=6):
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(length))
 
+# Insert URL into database
 def insert_url(original_url, short_code):
     with sqlite3.connect(DATABASE) as conn:
         conn.execute(
@@ -30,6 +32,7 @@ def insert_url(original_url, short_code):
             (original_url, short_code)
         )
 
+# Retrieve original URL from short code
 def get_original_url(short_code):
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.execute(
@@ -39,6 +42,7 @@ def get_original_url(short_code):
         result = cursor.fetchone()
         return result[0] if result else None
 
+# Homepage: show form and result
 @app.route("/", methods=["GET", "POST"])
 def index():
     short_url = None
@@ -58,6 +62,7 @@ def index():
 
     return render_template("index.html", short_url=short_url)
 
+# Redirect short URL
 @app.route("/<short_code>")
 def redirect_url(short_code):
     original_url = get_original_url(short_code)
@@ -65,8 +70,7 @@ def redirect_url(short_code):
         return redirect(original_url)
     return "URL not found", 404
 
-import os
-
+# Render-ready: use the PORT environment variable
 if __name__ == "__main__":
-    port = int(os.eviron.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
